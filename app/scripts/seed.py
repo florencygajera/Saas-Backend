@@ -1,5 +1,5 @@
 """
-Seed script — populates the database with demo data.
+Seed script -- populates the database with demo data.
 
 Run: python -m app.scripts.seed
 """
@@ -11,6 +11,9 @@ from uuid import uuid4
 
 # Ensure project root is on the path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# Import base to register all models first
+import app.db.base  # noqa: F401
 
 from app.core.security import hash_password
 from app.db.session import SessionLocal
@@ -30,7 +33,7 @@ def seed():
     try:
         # Check if data already exists
         if db.query(User).filter(User.email == "super@demo.com").first():
-            print("⚠️  Seed data already exists. Skipping.")
+            print("[SKIP] Seed data already exists. Skipping.")
             return
 
         now = datetime.now(timezone.utc)
@@ -49,10 +52,10 @@ def seed():
             is_active=True,
         )
         db.add(super_admin)
-        print("✅ Created SUPER_ADMIN: super@demo.com / Admin@123")
+        print("[OK] Created SUPER_ADMIN: super@demo.com / Admin@123")
 
         # ================================================================
-        # 2. TENANT 1 — Beauty Salon
+        # 2. TENANT 1 -- Beauty Salon
         # ================================================================
         tenant1_id = uuid4()
         tenant1 = Tenant(id=tenant1_id, name="Glamour Salon", plan="premium", is_active=True)
@@ -77,7 +80,7 @@ def seed():
             is_active=True,
         )
         db.add(admin1)
-        print("✅ Created Tenant 1: Glamour Salon — tenant1@demo.com / Admin@123")
+        print("[OK] Created Tenant 1: Glamour Salon -- tenant1@demo.com / Admin@123")
 
         # Services for tenant 1
         svc1_1 = Service(id=uuid4(), tenant_id=tenant1_id, name="Haircut", duration_min=30, price=25.00)
@@ -121,7 +124,7 @@ def seed():
             email="jane@example.com",
         )
         db.add(cust1b)
-        print("✅ Created Customer: customer1@demo.com / Admin@123 (Tenant 1)")
+        print("[OK] Created Customer: customer1@demo.com / Admin@123 (Tenant 1)")
 
         # Appointments for tenant 1
         appt1_1 = Appointment(
@@ -202,7 +205,7 @@ def seed():
         db.add_all([pay1_1, pay1_2, pay1_3])
 
         # ================================================================
-        # 3. TENANT 2 — Fitness Gym
+        # 3. TENANT 2 -- Fitness Gym
         # ================================================================
         tenant2_id = uuid4()
         tenant2 = Tenant(id=tenant2_id, name="PowerFit Gym", plan="basic", is_active=True)
@@ -227,7 +230,7 @@ def seed():
             is_active=True,
         )
         db.add(admin2)
-        print("✅ Created Tenant 2: PowerFit Gym — tenant2@demo.com / Admin@123")
+        print("[OK] Created Tenant 2: PowerFit Gym -- tenant2@demo.com / Admin@123")
 
         # Services for tenant 2
         svc2_1 = Service(id=uuid4(), tenant_id=tenant2_id, name="Personal Training", duration_min=60, price=60.00)
@@ -261,7 +264,7 @@ def seed():
             email="customer2@demo.com",
         )
         db.add(cust2)
-        print("✅ Created Customer: customer2@demo.com / Admin@123 (Tenant 2)")
+        print("[OK] Created Customer: customer2@demo.com / Admin@123 (Tenant 2)")
 
         # Appointments for tenant 2
         appt2_1 = Appointment(
@@ -313,6 +316,9 @@ def seed():
         )
         db.add_all([pay2_1, pay2_2])
 
+        # Flush all pending inserts before adding events (FK dependencies)
+        db.flush()
+
         # Events
         event1 = Event(
             tenant_id=tenant1_id,
@@ -329,19 +335,22 @@ def seed():
         db.add_all([event1, event2])
 
         db.commit()
-        print("\n🎉 Seed completed successfully!")
+        print("")
+        print("[DONE] Seed completed successfully!")
         print("=" * 50)
         print("Demo Accounts:")
-        print(f"  SUPER_ADMIN:  super@demo.com / Admin@123")
-        print(f"  TENANT_ADMIN: tenant1@demo.com / Admin@123 (Glamour Salon)")
-        print(f"  TENANT_ADMIN: tenant2@demo.com / Admin@123 (PowerFit Gym)")
-        print(f"  CUSTOMER:     customer1@demo.com / Admin@123 (Salon customer)")
-        print(f"  CUSTOMER:     customer2@demo.com / Admin@123 (Gym customer)")
+        print("  SUPER_ADMIN:  super@demo.com / Admin@123")
+        print("  TENANT_ADMIN: tenant1@demo.com / Admin@123 (Glamour Salon)")
+        print("  TENANT_ADMIN: tenant2@demo.com / Admin@123 (PowerFit Gym)")
+        print("  CUSTOMER:     customer1@demo.com / Admin@123 (Salon customer)")
+        print("  CUSTOMER:     customer2@demo.com / Admin@123 (Gym customer)")
         print("=" * 50)
 
     except Exception as e:
         db.rollback()
-        print(f"❌ Seed failed: {e}")
+        print(f"[ERROR] Seed failed: {e}")
+        import traceback
+        traceback.print_exc()
         raise
     finally:
         db.close()
