@@ -1,0 +1,274 @@
+﻿
+============================================================
+  LOGIN SUPER_ADMIN
+  Status: 200
+  Body: {
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkYWYyNjE1MS00MDhjLTQ5MzgtYWNhOC0wNDdjYjliNTg0ZjkiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJ0ZW5hbnRfaWQiOm51bGwsImV4cCI6MTc3MjE3ODQ2OX0.T5gnMeABIrhHN49N9UDrvBcjCVyoXCsnXbFpDKk6NNg",
+  "token_type": "bearer",
+  "user": {
+    "id": "daf26151-408c-4938-aca8-047cb9b584f9",
+    "name": "Super Admin",
+    "email": "super@demo.com",
+    "role": "SUPER_ADMIN",
+    "tenant_id": null,
+    "is_active": true,
+    "created_at": "2026-02-27T12:05:40.68
+
+============================================================
+  LIST TENANTS
+  Status: 200
+  Body: {
+  "data": [
+    {
+      "id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+      "name": "Glamour Salon",
+      "plan": "premium",
+      "is_active": true,
+      "created_at": "2026-02-27T12:05:40.658645+05:30"
+    },
+    {
+      "id": "34a1b00c-9ad1-4c1f-a4a6-36cd6c291584",
+      "name": "PowerFit Gym",
+      "plan": "basic",
+      "is_active": true,
+      "created_at": "2026-02-27T12:05:40.658654+05:30"
+    }
+  ],
+  "message": "Success",
+  "meta": {
+    "total": 2,
+    "skip": 0,
+    "limit": 50,
+
+============================================================
+  PLATFORM STATS
+  Status: 200
+  Body: {
+  "data": {
+    "platform_revenue": 240.0,
+    "total_bookings": 9,
+    "active_tenants": 2,
+    "new_tenants_last_30d": 2,
+    "top_tenants_by_revenue": [
+      {
+        "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+        "tenant_name": "Glamour Salon",
+        "revenue": 150.0
+      },
+      {
+        "tenant_id": "34a1b00c-9ad1-4c1f-a4a6-36cd6c291584",
+        "tenant_name": "PowerFit Gym",
+        "revenue": 90.0
+      }
+    ]
+  },
+  "message": "Success"
+}
+
+============================================================
+  LOGIN TENANT_ADMIN
+  Status: 200
+  Body: {
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZWY1NjEyOS05ZDkxLTQyZWQtYWJhYS00MWQ2ZDQxY2EzYzYiLCJyb2xlIjoiVEVOQU5UX0FETUlOIiwidGVuYW50X2lkIjoiYWEyMjg4ZjQtMGYyMS00YzJjLWJmZTgtZGVkOWZlMGRkN2E3IiwiZXhwIjoxNzcyMTc4NDY5fQ.OgX3kfHVt6OsVU47vKjfgm2jex0BRFerDYcBHEOyBqw",
+  "token_type": "bearer",
+  "user": {
+    "id": "6ef56129-9d91-42ed-abaa-41d6d41ca3c6",
+    "name": "Salon Admin",
+    "email": "tenant1@demo.com",
+    "role": "TENANT_ADMIN",
+    "tenant_id": "aa2288f4-0f21-4c2c-
+
+============================================================
+  TENANT STATS
+  Status: 200
+  Body: {
+  "data": {
+    "revenue": 150.0,
+    "total_bookings": 6,
+    "completed_count": 2,
+    "cancelled_count": 1,
+    "top_services": [
+      {
+        "service_id": "9d50178e-df11-4889-9906-21b778d31de8",
+        "service_name": "Haircut",
+        "bookings": 3,
+        "revenue": 75.0
+      },
+      {
+        "service_id": "26d398a2-07bb-4de4-9420-a566db960b27",
+        "service_name": "Facial",
+        "bookings": 1,
+        "revenue": 0.0
+      },
+      {
+        "service_id": "5d8e7afb-0297-
+
+============================================================
+  LIST SERVICES
+  Status: 200
+  Body: {
+  "data": [
+    {
+      "id": "9d50178e-df11-4889-9906-21b778d31de8",
+      "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+      "name": "Haircut",
+      "duration_min": 30,
+      "price": 25.0,
+      "is_active": true,
+      "created_at": "2026-02-27T12:05:40.664804+05:30"
+    },
+    {
+      "id": "8769b4f6-c3ee-4cf4-b6b9-694d8e7c1807",
+      "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+      "name": "Hair Coloring",
+      "duration_min": 90,
+      "price": 75.0,
+      "is_activ
+
+============================================================
+  LIST APPOINTMENTS
+  Status: 200
+  Body: {
+  "data": [
+    {
+      "id": "36fd7c66-3936-4567-b937-19bb13c6b750",
+      "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+      "customer_id": "d91f786f-f6ee-4322-864c-39bd1da699b5",
+      "staff_id": "ebcf1743-8662-4835-bc8e-70d8973d1e3f",
+      "service_id": "9d50178e-df11-4889-9906-21b778d31de8",
+      "start_at": "2026-02-22T10:05:40.274278+05:30",
+      "end_at": "2026-02-22T10:35:40.274278+05:30",
+      "status": "COMPLETED",
+      "notes": "Regular haircut",
+      "created_at": "
+
+============================================================
+  LOGIN CUSTOMER
+  Status: 200
+  Body: {
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiZjQ5NWFkOC02OTdmLTQ1ODgtOTk4Zi0wNDNmMTRlNWFhMTQiLCJyb2xlIjoiQ1VTVE9NRVIiLCJ0ZW5hbnRfaWQiOiJhYTIyODhmNC0wZjIxLTRjMmMtYmZlOC1kZWQ5ZmUwZGQ3YTciLCJleHAiOjE3NzIxNzg0NzB9.Md5x1jRojlk9QNi7t3aLfs9rWETBFGJXEeY4zd7l2bI",
+  "token_type": "bearer",
+  "user": {
+    "id": "bf495ad8-697f-4588-998f-043f14e5aa14",
+    "name": "John Customer",
+    "email": "customer1@demo.com",
+    "role": "CUSTOMER",
+    "tenant_id": "aa2288f4-0f21-4c2c-bfe8-d
+
+============================================================
+  PUBLIC SERVICES
+  Status: 200
+  Body: {
+  "data": [
+    {
+      "id": "9d50178e-df11-4889-9906-21b778d31de8",
+      "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+      "name": "Haircut",
+      "duration_min": 30,
+      "price": 25.0,
+      "is_active": true,
+      "created_at": "2026-02-27T12:05:40.664804+05:30"
+    },
+    {
+      "id": "8769b4f6-c3ee-4cf4-b6b9-694d8e7c1807",
+      "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+      "name": "Hair Coloring",
+      "duration_min": 90,
+      "price": 75.0,
+      "is_activ
+
+============================================================
+  MY BOOKINGS
+  Status: 200
+  Body: {
+  "data": [
+    {
+      "id": "a16cdcec-2e16-422e-a6de-9929af2f5d44",
+      "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+      "customer_id": "d91f786f-f6ee-4322-864c-39bd1da699b5",
+      "staff_id": "ebcf1743-8662-4835-bc8e-70d8973d1e3f",
+      "service_id": "9d50178e-df11-4889-9906-21b778d31de8",
+      "start_at": "2026-03-01T17:05:40.274278+05:30",
+      "end_at": "2026-03-01T17:35:40.274278+05:30",
+      "status": "CONFIRMED",
+      "notes": null,
+      "created_at": "2026-02-27T12
+
+============================================================
+  CREATE BOOKING
+  Status: 200
+  Body: {
+  "data": {
+    "id": "6e583f5c-e66d-4d0f-874a-73de43df3bb9",
+    "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+    "customer_id": "d91f786f-f6ee-4322-864c-39bd1da699b5",
+    "staff_id": null,
+    "service_id": "9d50178e-df11-4889-9906-21b778d31de8",
+    "start_at": "2026-03-01T15:30:00+05:30",
+    "end_at": "2026-03-01T16:00:00+05:30",
+    "status": "PENDING",
+    "notes": null,
+    "created_at": "2026-02-27T12:17:50.086347+05:30",
+    "updated_at": "2026-02-27T12:17:50.086355+05:30"
+ 
+
+============================================================
+  START PAYMENT
+  Status: 200
+  Body: {
+  "data": {
+    "id": "4002bf1e-a688-47c0-beb7-5fb3adafc13f",
+    "tenant_id": "aa2288f4-0f21-4c2c-bfe8-ded9fe0dd7a7",
+    "appointment_id": "6e583f5c-e66d-4d0f-874a-73de43df3bb9",
+    "amount": 25.0,
+    "currency": "USD",
+    "status": "PROCESSING",
+    "created_at": "2026-02-27T12:17:50.111763+05:30"
+  },
+  "message": "Payment initiated"
+}
+
+============================================================
+  VERIFY PAYMENT
+  Status: 200
+  Body: {
+  "data": {
+    "payment_id": "4002bf1e-a688-47c0-beb7-5fb3adafc13f",
+    "appointment_id": "6e583f5c-e66d-4d0f-874a-73de43df3bb9",
+    "amount": 25.0,
+    "currency": "USD",
+    "status": "PAID",
+    "paid_at": "2026-02-27T06:47:50.144718Z",
+    "message": "Payment verified successfully"
+  },
+  "message": "Payment verified"
+}
+
+============================================================
+  TENANT STATS (AFTER)
+  Status: 200
+  Body: {
+  "data": {
+    "revenue": 175.0,
+    "total_bookings": 7,
+    "completed_count": 2,
+    "cancelled_count": 1,
+    "top_services": [
+      {
+        "service_id": "9d50178e-df11-4889-9906-21b778d31de8",
+        "service_name": "Haircut",
+        "bookings": 4,
+        "revenue": 100.0
+      },
+      {
+        "service_id": "26d398a2-07bb-4de4-9420-a566db960b27",
+        "service_name": "Facial",
+        "bookings": 1,
+        "revenue": 0.0
+      },
+      {
+        "service_id": "5d8e7afb-0297
+
+============================================================
+  ALL TESTS COMPLETED!
+============================================================
