@@ -21,12 +21,13 @@ class Settings(BaseSettings):
     # App
     APP_NAME: str = "SaaS CRM + Booking API"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = False
+    APP_DEBUG: bool = False
 
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",
         "case_sensitive": True,
+        "extra": "ignore",
     }
 
 
