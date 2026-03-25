@@ -15,7 +15,9 @@ class PaymentRepository(BaseRepository[Payment]):
     def __init__(self, db: Session):
         super().__init__(Payment, db)
 
-    def get_by_appointment(self, appointment_id: UUID, tenant_id: UUID) -> Optional[Payment]:
+    def get_by_appointment(
+        self, appointment_id: UUID, tenant_id: UUID
+    ) -> Optional[Payment]:
         return (
             self.db.query(Payment)
             .filter(

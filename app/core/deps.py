@@ -55,19 +55,25 @@ def get_current_user(
     )
 
 
-def require_super_admin(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+def require_super_admin(
+    current_user: CurrentUser = Depends(get_current_user),
+) -> CurrentUser:
     if current_user.role != "SUPER_ADMIN":
         raise ForbiddenError("Super admin access required")
     return current_user
 
 
-def require_tenant_admin(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+def require_tenant_admin(
+    current_user: CurrentUser = Depends(get_current_user),
+) -> CurrentUser:
     if current_user.role != "TENANT_ADMIN":
         raise ForbiddenError("Tenant admin access required")
     return current_user
 
 
-def require_customer(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+def require_customer(
+    current_user: CurrentUser = Depends(get_current_user),
+) -> CurrentUser:
     if current_user.role != "CUSTOMER":
         raise ForbiddenError("Customer access required")
     return current_user

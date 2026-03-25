@@ -7,8 +7,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-
 # ---------- Tenant analytics ----------
+
 
 class TopServiceItem(BaseModel):
     service_id: UUID
@@ -27,6 +27,7 @@ class TenantStats(BaseModel):
 
 
 # ---------- Platform analytics ----------
+
 
 class TopTenantItem(BaseModel):
     tenant_id: UUID

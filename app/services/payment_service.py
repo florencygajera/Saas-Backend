@@ -61,7 +61,9 @@ class PaymentService:
         if not payment:
             raise NotFoundError("Payment not found")
         if payment.status != "PROCESSING":
-            raise BadRequestError(f"Payment status is {payment.status}, expected PROCESSING")
+            raise BadRequestError(
+                f"Payment status is {payment.status}, expected PROCESSING"
+            )
 
         # Mark paid
         payment.status = "PAID"

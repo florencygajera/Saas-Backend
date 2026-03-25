@@ -18,6 +18,7 @@ class AppointmentCreate(BaseModel):
 
 class AppointmentUpdate(BaseModel):
     """For rescheduling — only allowed when status is PENDING."""
+
     start_at: Optional[datetime] = None
     notes: Optional[str] = None
 

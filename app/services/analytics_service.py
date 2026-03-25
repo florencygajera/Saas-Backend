@@ -79,14 +79,20 @@ class AnalyticsService:
                     0,
                 ).label("revenue"),
             )
-            .outerjoin(Appointment, and_(
-                Appointment.service_id == Service.id,
-                Appointment.tenant_id == tenant_id,
-            ))
-            .outerjoin(Payment, and_(
-                Payment.appointment_id == Appointment.id,
-                Payment.tenant_id == tenant_id,
-            ))
+            .outerjoin(
+                Appointment,
+                and_(
+                    Appointment.service_id == Service.id,
+                    Appointment.tenant_id == tenant_id,
+                ),
+            )
+            .outerjoin(
+                Payment,
+                and_(
+                    Payment.appointment_id == Appointment.id,
+                    Payment.tenant_id == tenant_id,
+                ),
+            )
             .filter(Service.tenant_id == tenant_id)
             .group_by(Service.id, Service.name)
             .order_by(func.count(Appointment.id).desc())
@@ -109,9 +115,7 @@ class AnalyticsService:
             self.db.query(
                 # PostgreSQL: extract DOW returns 0=Sun, 1=Mon, etc.
                 # Shift to ISO: 0=Mon ... 6=Sun
-                func.mod(
-                    (extract("dow", Appointment.start_at) + 6), 7
-                ).label("day"),
+                func.mod((extract("dow", Appointment.start_at) + 6), 7).label("day"),
                 extract("hour", Appointment.start_at).label("hour"),
                 func.count(Appointment.id).label("cnt"),
             )
@@ -194,10 +198,13 @@ class AnalyticsService:
                 Tenant.name,
                 func.coalesce(func.sum(Payment.amount), 0).label("rev"),
             )
-            .outerjoin(Payment, and_(
-                Payment.tenant_id == Tenant.id,
-                Payment.status == "PAID",
-            ))
+            .outerjoin(
+                Payment,
+                and_(
+                    Payment.tenant_id == Tenant.id,
+                    Payment.status == "PAID",
+                ),
+            )
             .group_by(Tenant.id, Tenant.name)
             .order_by(func.coalesce(func.sum(Payment.amount), 0).desc())
             .limit(10)

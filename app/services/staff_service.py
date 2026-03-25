@@ -22,7 +22,9 @@ class StaffService:
         obj = self.repo.create(obj)
         return StaffOut.model_validate(obj)
 
-    def list(self, tenant_id: UUID, skip: int = 0, limit: int = 50) -> Tuple[List[StaffOut], int]:
+    def list(
+        self, tenant_id: UUID, skip: int = 0, limit: int = 50
+    ) -> Tuple[List[StaffOut], int]:
         items = self.repo.get_all(tenant_id=tenant_id, skip=skip, limit=limit)
         total = self.repo.count(tenant_id=tenant_id)
         return [StaffOut.model_validate(s) for s in items], total

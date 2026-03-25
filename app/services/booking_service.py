@@ -21,7 +21,6 @@ from app.schemas.appointment import (
     StatusUpdate,
 )
 
-
 # ---------------------------------------------------------------------------
 # State machine transition rules
 # ---------------------------------------------------------------------------
@@ -100,7 +99,9 @@ class BookingService:
         items = self.appt_repo.get_by_customer(
             customer_id=customer_id, tenant_id=tenant_id, skip=skip, limit=limit
         )
-        total = self.appt_repo.count_by_customer(customer_id=customer_id, tenant_id=tenant_id)
+        total = self.appt_repo.count_by_customer(
+            customer_id=customer_id, tenant_id=tenant_id
+        )
         return [AppointmentOut.model_validate(a) for a in items], total
 
     # ----- Reschedule (customer, only if PENDING) -----
@@ -172,8 +173,7 @@ class BookingService:
 
         if new not in allowed:
             raise BadRequestError(
-                f"Cannot transition from {current} to {new}. "
-                f"Allowed: {allowed}"
+                f"Cannot transition from {current} to {new}. " f"Allowed: {allowed}"
             )
 
         appt.status = new

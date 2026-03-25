@@ -29,7 +29,9 @@ class BaseRepository(Generic[ModelType]):
             q = q.filter(self.model.tenant_id == tenant_id)  # type: ignore
         return q
 
-    def get_by_id(self, id: UUID, tenant_id: Optional[UUID] = None) -> Optional[ModelType]:
+    def get_by_id(
+        self, id: UUID, tenant_id: Optional[UUID] = None
+    ) -> Optional[ModelType]:
         return self._base_query(tenant_id).filter(self.model.id == id).first()  # type: ignore
 
     def get_all(

@@ -25,7 +25,9 @@ def provision_tenant(
 ):
     service = TenantService(db)
     result = service.provision_tenant(payload)
-    return SingleResponse(data=result.model_dump(), message="Tenant provisioned successfully")
+    return SingleResponse(
+        data=result.model_dump(), message="Tenant provisioned successfully"
+    )
 
 
 @router.get("/tenants", response_model=PaginatedResponse)

@@ -10,7 +10,9 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 # Ensure project root is on the path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 # Import base to register all models first
 import app.db.base  # noqa: F401
@@ -58,7 +60,9 @@ def seed():
         # 2. TENANT 1 -- Beauty Salon
         # ================================================================
         tenant1_id = uuid4()
-        tenant1 = Tenant(id=tenant1_id, name="Glamour Salon", plan="premium", is_active=True)
+        tenant1 = Tenant(
+            id=tenant1_id, name="Glamour Salon", plan="premium", is_active=True
+        )
         db.add(tenant1)
 
         sub1 = Subscription(
@@ -83,10 +87,34 @@ def seed():
         print("[OK] Created Tenant 1: Glamour Salon -- tenant1@demo.com / Admin@123")
 
         # Services for tenant 1
-        svc1_1 = Service(id=uuid4(), tenant_id=tenant1_id, name="Haircut", duration_min=30, price=25.00)
-        svc1_2 = Service(id=uuid4(), tenant_id=tenant1_id, name="Hair Coloring", duration_min=90, price=75.00)
-        svc1_3 = Service(id=uuid4(), tenant_id=tenant1_id, name="Manicure", duration_min=45, price=35.00)
-        svc1_4 = Service(id=uuid4(), tenant_id=tenant1_id, name="Facial", duration_min=60, price=50.00)
+        svc1_1 = Service(
+            id=uuid4(),
+            tenant_id=tenant1_id,
+            name="Haircut",
+            duration_min=30,
+            price=25.00,
+        )
+        svc1_2 = Service(
+            id=uuid4(),
+            tenant_id=tenant1_id,
+            name="Hair Coloring",
+            duration_min=90,
+            price=75.00,
+        )
+        svc1_3 = Service(
+            id=uuid4(),
+            tenant_id=tenant1_id,
+            name="Manicure",
+            duration_min=45,
+            price=35.00,
+        )
+        svc1_4 = Service(
+            id=uuid4(),
+            tenant_id=tenant1_id,
+            name="Facial",
+            duration_min=60,
+            price=50.00,
+        )
         db.add_all([svc1_1, svc1_2, svc1_3, svc1_4])
 
         # Staff for tenant 1
@@ -208,7 +236,9 @@ def seed():
         # 3. TENANT 2 -- Fitness Gym
         # ================================================================
         tenant2_id = uuid4()
-        tenant2 = Tenant(id=tenant2_id, name="PowerFit Gym", plan="basic", is_active=True)
+        tenant2 = Tenant(
+            id=tenant2_id, name="PowerFit Gym", plan="basic", is_active=True
+        )
         db.add(tenant2)
 
         sub2 = Subscription(
@@ -233,9 +263,27 @@ def seed():
         print("[OK] Created Tenant 2: PowerFit Gym -- tenant2@demo.com / Admin@123")
 
         # Services for tenant 2
-        svc2_1 = Service(id=uuid4(), tenant_id=tenant2_id, name="Personal Training", duration_min=60, price=60.00)
-        svc2_2 = Service(id=uuid4(), tenant_id=tenant2_id, name="Yoga Class", duration_min=45, price=20.00)
-        svc2_3 = Service(id=uuid4(), tenant_id=tenant2_id, name="CrossFit Session", duration_min=60, price=30.00)
+        svc2_1 = Service(
+            id=uuid4(),
+            tenant_id=tenant2_id,
+            name="Personal Training",
+            duration_min=60,
+            price=60.00,
+        )
+        svc2_2 = Service(
+            id=uuid4(),
+            tenant_id=tenant2_id,
+            name="Yoga Class",
+            duration_min=45,
+            price=20.00,
+        )
+        svc2_3 = Service(
+            id=uuid4(),
+            tenant_id=tenant2_id,
+            name="CrossFit Session",
+            duration_min=60,
+            price=30.00,
+        )
         db.add_all([svc2_1, svc2_2, svc2_3])
 
         # Staff for tenant 2
@@ -350,6 +398,7 @@ def seed():
         db.rollback()
         print(f"[ERROR] Seed failed: {e}")
         import traceback
+
         traceback.print_exc()
         raise
     finally:

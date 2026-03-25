@@ -28,7 +28,9 @@ class ServiceService:
         svc = self.repo.create(svc)
         return ServiceOut.model_validate(svc)
 
-    def list(self, tenant_id: UUID, skip: int = 0, limit: int = 50) -> Tuple[List[ServiceOut], int]:
+    def list(
+        self, tenant_id: UUID, skip: int = 0, limit: int = 50
+    ) -> Tuple[List[ServiceOut], int]:
         items = self.repo.get_all(tenant_id=tenant_id, skip=skip, limit=limit)
         total = self.repo.count(tenant_id=tenant_id)
         return [ServiceOut.model_validate(s) for s in items], total
@@ -39,7 +41,9 @@ class ServiceService:
             raise NotFoundError("Service not found")
         return ServiceOut.model_validate(svc)
 
-    def update(self, service_id: UUID, tenant_id: UUID, payload: ServiceUpdate) -> ServiceOut:
+    def update(
+        self, service_id: UUID, tenant_id: UUID, payload: ServiceUpdate
+    ) -> ServiceOut:
         svc = self.repo.get_by_id(service_id, tenant_id=tenant_id)
         if not svc:
             raise NotFoundError("Service not found")

@@ -27,7 +27,9 @@ class CustomerService:
         obj = self.repo.create(obj)
         return CustomerOut.model_validate(obj)
 
-    def list(self, tenant_id: UUID, skip: int = 0, limit: int = 50) -> Tuple[List[CustomerOut], int]:
+    def list(
+        self, tenant_id: UUID, skip: int = 0, limit: int = 50
+    ) -> Tuple[List[CustomerOut], int]:
         items = self.repo.get_all(tenant_id=tenant_id, skip=skip, limit=limit)
         total = self.repo.count(tenant_id=tenant_id)
         return [CustomerOut.model_validate(c) for c in items], total
@@ -38,7 +40,9 @@ class CustomerService:
             raise NotFoundError("Customer not found")
         return CustomerOut.model_validate(obj)
 
-    def update(self, customer_id: UUID, tenant_id: UUID, payload: CustomerUpdate) -> CustomerOut:
+    def update(
+        self, customer_id: UUID, tenant_id: UUID, payload: CustomerUpdate
+    ) -> CustomerOut:
         obj = self.repo.get_by_id(customer_id, tenant_id=tenant_id)
         if not obj:
             raise NotFoundError("Customer not found")

@@ -26,8 +26,7 @@ def _get_customer_id(user: CurrentUser, db: Session) -> UUID:
     customer = repo.get_by_user_id(user.user_id, user.tenant_id)
     if not customer:
         raise NotFoundError(
-            "No customer profile linked to your account. "
-            "Contact the business admin."
+            "No customer profile linked to your account. " "Contact the business admin."
         )
     return customer.id
 
@@ -46,9 +45,7 @@ def browse_services(
     active = [s for s in items if s.is_active]
     return PaginatedResponse(
         data=[s.model_dump() for s in active],
-        meta=PaginationMeta(
-            total=len(active), skip=skip, limit=limit, has_more=False
-        ),
+        meta=PaginationMeta(total=len(active), skip=skip, limit=limit, has_more=False),
     )
 
 

@@ -33,4 +33,6 @@ class Customer(Base):
 
     tenant = relationship("Tenant", back_populates="customers")
     user = relationship("User", back_populates="customer_profile")
-    appointments = relationship("Appointment", back_populates="customer", lazy="dynamic")
+    appointments = relationship(
+        "Appointment", back_populates="customer", lazy="dynamic"
+    )

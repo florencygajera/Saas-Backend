@@ -12,10 +12,10 @@ from jose import jwt
 
 from app.core.config import settings
 
-
 # ---------------------------------------------------------------------------
 # Password hashing (using bcrypt directly)
 # ---------------------------------------------------------------------------
+
 
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
@@ -30,6 +30,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 # ---------------------------------------------------------------------------
 # JWT
 # ---------------------------------------------------------------------------
+
 
 def create_access_token(
     user_id: UUID,

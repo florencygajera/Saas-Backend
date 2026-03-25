@@ -27,7 +27,9 @@ class Tenant(Base):
 
     # relationships
     users = relationship("User", back_populates="tenant", lazy="dynamic")
-    subscriptions = relationship("Subscription", back_populates="tenant", lazy="dynamic")
+    subscriptions = relationship(
+        "Subscription", back_populates="tenant", lazy="dynamic"
+    )
     services = relationship("Service", back_populates="tenant", lazy="dynamic")
     staff_members = relationship("Staff", back_populates="tenant", lazy="dynamic")
     customers = relationship("Customer", back_populates="tenant", lazy="dynamic")
