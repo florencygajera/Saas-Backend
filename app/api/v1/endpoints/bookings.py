@@ -22,6 +22,7 @@ router = APIRouter(tags=["Bookings"])
 
 def _get_customer_id(user: CurrentUser, db: Session) -> UUID:
     """Resolve the customer profile for the authenticated user."""
+    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
     repo = CustomerRepository(db)
     customer = repo.get_by_user_id(user.user_id, user.tenant_id)
     if not customer:
@@ -57,6 +58,7 @@ def create_booking(
 ):
     customer_id = _get_customer_id(user, db)
     svc = BookingService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for booking operations"
     result = svc.create_appointment(
         tenant_id=user.tenant_id,
         customer_id=customer_id,
@@ -74,6 +76,7 @@ def my_bookings(
 ):
     customer_id = _get_customer_id(user, db)
     svc = BookingService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for booking operations"
     items, total = svc.list_customer_bookings(
         customer_id=customer_id,
         tenant_id=user.tenant_id,
@@ -97,6 +100,7 @@ def reschedule_booking(
 ):
     customer_id = _get_customer_id(user, db)
     svc = BookingService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for booking operations"
     result = svc.reschedule(
         appointment_id=booking_id,
         tenant_id=user.tenant_id,
@@ -114,6 +118,7 @@ def cancel_booking(
 ):
     customer_id = _get_customer_id(user, db)
     svc = BookingService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for booking operations"
     result = svc.cancel_by_customer(
         appointment_id=booking_id,
         tenant_id=user.tenant_id,

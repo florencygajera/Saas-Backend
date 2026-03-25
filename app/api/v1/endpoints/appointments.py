@@ -24,6 +24,9 @@ def list_appointments(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = BookingService(db)
+    assert (
+        user.tenant_id is not None
+    ), "Tenant ID is required for appointment operations"
     items, total = svc.list_tenant_appointments(
         tenant_id=user.tenant_id, skip=skip, limit=limit
     )
@@ -52,10 +55,16 @@ def update_appointment_status(
 
     customer_id = None
     if user.role == "CUSTOMER":
+        assert (
+            user.tenant_id is not None
+        ), "Tenant ID is required for customer operations"
         cust_repo = CustomerRepository(db)
         customer = cust_repo.get_by_user_id(user.user_id, user.tenant_id)
         customer_id = customer.id if customer else None
 
+    assert (
+        user.tenant_id is not None
+    ), "Tenant ID is required for appointment operations"
     result = svc.update_status(
         appointment_id=appointment_id,
         tenant_id=user.tenant_id,

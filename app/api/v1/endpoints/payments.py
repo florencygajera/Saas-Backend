@@ -21,6 +21,7 @@ def start_payment(
     user: CurrentUser = Depends(get_current_user),
 ):
     svc = PaymentService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for payment operations"
     result = svc.start_payment(
         appointment_id=payload.appointment_id,
         tenant_id=user.tenant_id,
@@ -35,6 +36,7 @@ def verify_payment(
     user: CurrentUser = Depends(get_current_user),
 ):
     svc = PaymentService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for payment operations"
     result = svc.verify_payment(
         payment_id=payload.payment_id,
         otp=payload.otp,

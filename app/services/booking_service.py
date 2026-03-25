@@ -122,6 +122,7 @@ class BookingService:
 
         if payload.start_at is not None:
             svc = self.service_repo.get_by_id(appt.service_id, tenant_id=tenant_id)
+            assert svc is not None, "Service not found"
             appt.start_at = payload.start_at
             appt.end_at = payload.start_at + timedelta(minutes=svc.duration_min)
         if payload.notes is not None:

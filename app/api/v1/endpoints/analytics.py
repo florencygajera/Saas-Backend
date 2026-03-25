@@ -19,5 +19,6 @@ def tenant_stats(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     analytics = AnalyticsService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for analytics operations"
     stats = analytics.get_tenant_stats(user.tenant_id)
     return SingleResponse(data=stats.model_dump())

@@ -23,6 +23,7 @@ def create_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
     result = svc.create(tenant_id=user.tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Customer created")
 
@@ -35,6 +36,7 @@ def list_customers(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
     items, total = svc.list(tenant_id=user.tenant_id, skip=skip, limit=limit)
     return PaginatedResponse(
         data=[c.model_dump() for c in items],
@@ -51,6 +53,7 @@ def get_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
     result = svc.get(customer_id, tenant_id=user.tenant_id)
     return SingleResponse(data=result.model_dump())
 
@@ -63,6 +66,7 @@ def update_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
     result = svc.update(customer_id, tenant_id=user.tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Customer updated")
 
@@ -74,5 +78,6 @@ def delete_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
     svc.delete(customer_id, tenant_id=user.tenant_id)
     return SingleResponse(message="Customer deleted")

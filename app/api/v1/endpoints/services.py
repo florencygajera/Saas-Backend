@@ -23,6 +23,7 @@ def create_service(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = ServiceService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for service operations"
     result = svc.create(tenant_id=user.tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Service created")
 
@@ -35,6 +36,7 @@ def list_services(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = ServiceService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for service operations"
     items, total = svc.list(tenant_id=user.tenant_id, skip=skip, limit=limit)
     return PaginatedResponse(
         data=[s.model_dump() for s in items],
@@ -51,6 +53,7 @@ def get_service(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = ServiceService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for service operations"
     result = svc.get(service_id, tenant_id=user.tenant_id)
     return SingleResponse(data=result.model_dump())
 
@@ -63,6 +66,7 @@ def update_service(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = ServiceService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for service operations"
     result = svc.update(service_id, tenant_id=user.tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Service updated")
 
@@ -74,5 +78,6 @@ def delete_service(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = ServiceService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for service operations"
     svc.delete(service_id, tenant_id=user.tenant_id)
     return SingleResponse(message="Service deleted")

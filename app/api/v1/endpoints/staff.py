@@ -23,6 +23,7 @@ def create_staff(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = StaffService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for staff operations"
     result = svc.create(tenant_id=user.tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Staff created")
 
@@ -35,6 +36,7 @@ def list_staff(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = StaffService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for staff operations"
     items, total = svc.list(tenant_id=user.tenant_id, skip=skip, limit=limit)
     return PaginatedResponse(
         data=[s.model_dump() for s in items],
@@ -51,6 +53,7 @@ def get_staff(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = StaffService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for staff operations"
     result = svc.get(staff_id, tenant_id=user.tenant_id)
     return SingleResponse(data=result.model_dump())
 
@@ -63,6 +66,7 @@ def update_staff(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = StaffService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for staff operations"
     result = svc.update(staff_id, tenant_id=user.tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Staff updated")
 
@@ -74,5 +78,6 @@ def delete_staff(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = StaffService(db)
+    assert user.tenant_id is not None, "Tenant ID is required for staff operations"
     svc.delete(staff_id, tenant_id=user.tenant_id)
     return SingleResponse(message="Staff deleted")
