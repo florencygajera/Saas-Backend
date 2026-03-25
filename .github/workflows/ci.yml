@@ -74,14 +74,12 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_saas_crm
         run: |
-          cd Saas-Backend
           alembic upgrade head
       
       - name: Run seed
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_saas_crm
         run: |
-          cd Saas-Backend
           python -m app.scripts.seed
       
       - name: Run pytest
@@ -89,7 +87,6 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_saas_crm
           JWT_SECRET: test-secret-key
         run: |
-          cd Saas-Backend
           pytest -v
 
   security:

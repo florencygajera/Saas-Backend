@@ -14,9 +14,9 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to ${{ github.inputs.environment }}
+    name: Deploy to ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
-    environment: ${{ github.inputs.environment }}
+    environment: ${{ github.event.inputs.environment }}
     
     steps:
       - name: Checkout code
@@ -36,27 +36,28 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          cd Saas-Backend
           alembic upgrade head
       
       - name: Run seed (staging only)
-        if: github.inputs.environment == 'staging'
+        if: github.event.inputs.environment == 'staging'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          cd Saas-Backend
           python -m app.scripts.seed
       
+      - name: Install test dependencies
+        run: |
+          pip install pytest httpx
+
       - name: Run tests
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
-          cd Saas-Backend
           pytest -v
       
       - name: Deploy via SSH
-        if: github.inputs.environment == 'production'
+        if: github.event.inputs.environment == 'production'
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -82,8 +83,8 @@ jobs:
       
       - name: Check API health
         run: |
-          curl -f https://api.${{ github.inputs.environment }}.example.com/health || exit 1
-      
+          curl -f https://api.${{ github.event.inputs.environment }}.example.com/health || exit 1
+
       - name: Check API docs
         run: |
-          curl -f https://api.${{ github.inputs.environment }}.example.com/docs || exit 1
+          curl -f https://api.${{ github.event.inputs.environment }}.example.com/docs || exit 1
