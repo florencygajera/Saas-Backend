@@ -10,8 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import require_super_admin, CurrentUser
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
-from app.schemas.tenant import TenantCreate, TenantOut, TenantProvisionResponse, TenantUpdate
-from app.schemas.analytics import PlatformStats, TenantStats
+from app.schemas.tenant import TenantCreate, TenantOut, TenantUpdate
 from app.services.tenant_service import TenantService
 from app.services.analytics_service import AnalyticsService
 

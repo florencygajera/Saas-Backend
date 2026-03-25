@@ -44,7 +44,7 @@ def get_current_user(
         raise UnauthorizedError("Invalid token payload")
 
     # Verify user still exists and is active
-    user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
+    user = db.query(User).filter(User.id == user_id, User.is_active).first()
     if not user:
         raise UnauthorizedError("User not found or inactive")
 

@@ -3,7 +3,6 @@ Analytics service — tenant stats + platform stats.
 """
 
 from datetime import datetime, timedelta, timezone
-from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import func, extract, case, and_
@@ -170,9 +169,6 @@ class AnalyticsService:
             .distinct()
             .subquery()
         )
-
-        active_with_bookings = self.db.query(tenants_with_bookings).count()
-        active_with_logins = self.db.query(tenants_with_logins).count()
 
         # Union-like: count distinct tenant_ids from both
         active_tenant_ids = set()

@@ -2,7 +2,7 @@
 Analytics schemas.
 """
 
-from typing import List, Optional
+from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel

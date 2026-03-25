@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import require_tenant_admin, CurrentUser
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
-from app.schemas.staff import StaffCreate, StaffUpdate, StaffOut
+from app.schemas.staff import StaffCreate, StaffUpdate
 from app.services.staff_service import StaffService
 
 router = APIRouter(prefix="/staff", tags=["Staff"])

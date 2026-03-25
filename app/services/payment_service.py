@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError, BadRequestError
 from app.models.payment import Payment
-from app.models.appointment import Appointment
 from app.repositories.payment_repo import PaymentRepository
 from app.repositories.appointment_repo import AppointmentRepository
 from app.repositories.service_repo import ServiceRepository

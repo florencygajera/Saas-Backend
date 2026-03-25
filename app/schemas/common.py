@@ -2,7 +2,7 @@
 Common schemas: pagination, response wrapper.
 """
 
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import Any, Generic, List, TypeVar
 from pydantic import BaseModel
 
 T = TypeVar("T")

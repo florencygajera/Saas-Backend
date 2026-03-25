@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user, require_tenant_admin, CurrentUser
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
-from app.schemas.appointment import StatusUpdate, AppointmentOut
+from app.schemas.appointment import StatusUpdate
 from app.services.booking_service import BookingService
 
 router = APIRouter(prefix="/appointments", tags=["Appointments"])

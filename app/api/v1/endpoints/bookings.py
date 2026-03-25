@@ -7,12 +7,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.core.deps import require_customer, get_current_user, CurrentUser
-from app.core.exceptions import NotFoundError, ForbiddenError
+from app.core.deps import require_customer, CurrentUser
+from app.core.exceptions import NotFoundError
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
-from app.schemas.appointment import AppointmentCreate, AppointmentUpdate, AppointmentOut
-from app.schemas.service import ServiceOut
+from app.schemas.appointment import AppointmentCreate, AppointmentUpdate
+
 from app.services.booking_service import BookingService
 from app.services.service_service import ServiceService
 from app.repositories.customer_repo import CustomerRepository

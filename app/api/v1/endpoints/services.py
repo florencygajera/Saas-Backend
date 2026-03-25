@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import require_tenant_admin, CurrentUser
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
-from app.schemas.service import ServiceCreate, ServiceUpdate, ServiceOut
+from app.schemas.service import ServiceCreate, ServiceUpdate
 from app.services.service_service import ServiceService
 
 router = APIRouter(prefix="/services", tags=["Services"])
