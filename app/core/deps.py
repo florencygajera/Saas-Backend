@@ -1,6 +1,4 @@
-"""
-FastAPI dependencies: DB session, current user extraction, role guards.
-"""
+"""FastAPI dependencies: DB session, auth extraction, and role guards."""
 
 from typing import Optional
 from uuid import UUID
@@ -12,9 +10,11 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import UnauthorizedError, ForbiddenError
 from app.core.security import decode_access_token
 from app.db.session import get_db
+from app.models.tenant import Tenant
 from app.models.user import User
 
 security_scheme = HTTPBearer()
+optional_security_scheme = HTTPBearer(auto_error=False)
 
 
 class CurrentUser:
@@ -43,16 +43,36 @@ def get_current_user(
     if not user_id or not role:
         raise UnauthorizedError("Invalid token payload")
 
-    # Verify user still exists and is active
+    # Verify user still exists and is active.
     user = db.query(User).filter(User.id == user_id, User.is_active).first()
     if not user:
         raise UnauthorizedError("User not found or inactive")
+
+    # Enforce tenant is active for tenant-scoped roles.
+    if user.role != "SUPER_ADMIN":
+        if user.tenant_id is None:
+            raise UnauthorizedError("Invalid user tenant mapping")
+        tenant = db.query(Tenant).filter(Tenant.id == user.tenant_id).first()
+        if not tenant or not tenant.is_active:
+            raise ForbiddenError("Tenant is disabled")
 
     return CurrentUser(
         user_id=UUID(user_id),
         role=role,
         tenant_id=UUID(tenant_id) if tenant_id else None,
     )
+
+
+def get_optional_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Security(optional_security_scheme),
+    db: Session = Depends(get_db),
+) -> CurrentUser | None:
+    if not credentials:
+        return None
+    try:
+        return get_current_user(credentials=credentials, db=db)
+    except Exception:
+        return None
 
 
 def require_super_admin(
@@ -85,3 +105,9 @@ def require_tenant_admin_or_customer(
     if current_user.role not in ("TENANT_ADMIN", "CUSTOMER"):
         raise ForbiddenError("Tenant admin or customer access required")
     return current_user
+
+
+def require_tenant_scope(current_user: CurrentUser) -> UUID:
+    if current_user.tenant_id is None:
+        raise ForbiddenError("Tenant-scoped access required")
+    return current_user.tenant_id

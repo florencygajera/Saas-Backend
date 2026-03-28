@@ -6,19 +6,23 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SubscriptionCreate(BaseModel):
     plan: str = "basic"
     price: float = 29.99
     status: str = "active"
+    start_at: Optional[datetime] = None
+    end_at: Optional[datetime] = None
 
 
 class SubscriptionUpdate(BaseModel):
     plan: Optional[str] = None
-    price: Optional[float] = None
+    price: Optional[float] = Field(default=None, ge=0)
     status: Optional[str] = None
+    start_at: Optional[datetime] = None
+    end_at: Optional[datetime] = None
 
 
 class SubscriptionOut(BaseModel):

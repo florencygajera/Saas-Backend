@@ -27,6 +27,10 @@ class StatusUpdate(BaseModel):
     new_status: str
 
 
+class AssignStaffRequest(BaseModel):
+    staff_id: UUID
+
+
 class AppointmentOut(BaseModel):
     id: UUID
     tenant_id: UUID

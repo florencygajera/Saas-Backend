@@ -11,6 +11,7 @@ from app.core.deps import require_super_admin, CurrentUser
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
 from app.schemas.tenant import TenantCreate, TenantOut, TenantUpdate
+from app.schemas.subscription import SubscriptionCreate, SubscriptionUpdate
 from app.services.tenant_service import TenantService
 from app.services.analytics_service import AnalyticsService
 
@@ -78,3 +79,38 @@ def tenant_stats_by_super(
     analytics = AnalyticsService(db)
     stats = analytics.get_tenant_stats(tenant_id)
     return SingleResponse(data=stats.model_dump())
+
+
+@router.post("/tenants/{tenant_id}/subscriptions", response_model=SingleResponse)
+def create_subscription(
+    tenant_id: UUID,
+    payload: SubscriptionCreate,
+    db: Session = Depends(get_db),
+    admin: CurrentUser = Depends(require_super_admin),
+):
+    service = TenantService(db)
+    sub = service.create_subscription(tenant_id=tenant_id, payload=payload)
+    return SingleResponse(data=sub.model_dump(), message="Subscription created")
+
+
+@router.get("/tenants/{tenant_id}/subscriptions", response_model=SingleResponse)
+def list_subscriptions(
+    tenant_id: UUID,
+    db: Session = Depends(get_db),
+    admin: CurrentUser = Depends(require_super_admin),
+):
+    service = TenantService(db)
+    items = service.list_subscriptions(tenant_id=tenant_id)
+    return SingleResponse(data=[item.model_dump() for item in items])
+
+
+@router.patch("/subscriptions/{subscription_id}", response_model=SingleResponse)
+def update_subscription(
+    subscription_id: UUID,
+    payload: SubscriptionUpdate,
+    db: Session = Depends(get_db),
+    admin: CurrentUser = Depends(require_super_admin),
+):
+    service = TenantService(db)
+    sub = service.update_subscription(subscription_id=subscription_id, payload=payload)
+    return SingleResponse(data=sub.model_dump(), message="Subscription updated")

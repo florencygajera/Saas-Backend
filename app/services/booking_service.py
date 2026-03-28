@@ -38,6 +38,14 @@ CUSTOMER_TRANSITIONS = {
     # customer cannot change any other status
 }
 
+VALID_APPOINTMENT_STATUSES = {
+    "PENDING",
+    "CONFIRMED",
+    "IN_PROGRESS",
+    "COMPLETED",
+    "CANCELLED",
+}
+
 
 class BookingService:
     def __init__(self, db: Session):
@@ -122,7 +130,8 @@ class BookingService:
 
         if payload.start_at is not None:
             svc = self.service_repo.get_by_id(appt.service_id, tenant_id=tenant_id)
-            assert svc is not None, "Service not found"
+            if not svc:
+                raise NotFoundError("Service not found")
             appt.start_at = payload.start_at
             appt.end_at = payload.start_at + timedelta(minutes=svc.duration_min)
         if payload.notes is not None:
@@ -162,6 +171,8 @@ class BookingService:
 
         current = appt.status
         new = payload.new_status.upper()
+        if new not in VALID_APPOINTMENT_STATUSES:
+            raise BadRequestError(f"Invalid status: {new}")
 
         if role == "CUSTOMER":
             if customer_id and appt.customer_id != customer_id:
@@ -178,5 +189,26 @@ class BookingService:
             )
 
         appt.status = new
+        appt = self.appt_repo.update(appt)
+        return AppointmentOut.model_validate(appt)
+
+    def assign_staff(
+        self,
+        appointment_id: UUID,
+        tenant_id: UUID,
+        staff_id: UUID,
+    ) -> AppointmentOut:
+        appt = self.appt_repo.get_by_id(appointment_id, tenant_id=tenant_id)
+        if not appt:
+            raise NotFoundError("Appointment not found")
+
+        if appt.status in ("COMPLETED", "CANCELLED"):
+            raise BadRequestError("Cannot assign staff for completed/cancelled appointment")
+
+        staff = self.staff_repo.get_by_id(staff_id, tenant_id=tenant_id)
+        if not staff or not staff.is_active:
+            raise NotFoundError("Staff not found or inactive")
+
+        appt.staff_id = staff.id
         appt = self.appt_repo.update(appt)
         return AppointmentOut.model_validate(appt)

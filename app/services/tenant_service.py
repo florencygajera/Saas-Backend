@@ -1,7 +1,6 @@
-"""
-Tenant service — provisioning, enable/disable, listing.
-"""
+"""Tenant service - provisioning, tenant management, and subscriptions."""
 
+from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -20,6 +19,7 @@ from app.schemas.tenant import (
     TenantProvisionResponse,
     TenantUpdate,
 )
+from app.schemas.subscription import SubscriptionCreate, SubscriptionUpdate, SubscriptionOut
 
 
 class TenantService:
@@ -98,3 +98,49 @@ class TenantService:
         if not tenant:
             raise NotFoundError("Tenant not found")
         return TenantOut.model_validate(tenant)
+
+    def create_subscription(
+        self,
+        tenant_id: UUID,
+        payload: SubscriptionCreate,
+    ) -> SubscriptionOut:
+        tenant = self.tenant_repo.get_by_id_no_filter(tenant_id)
+        if not tenant:
+            raise NotFoundError("Tenant not found")
+
+        sub = Subscription(
+            tenant_id=tenant_id,
+            plan=payload.plan,
+            price=payload.price,
+            status=payload.status,
+            start_at=payload.start_at or datetime.now(timezone.utc),
+            end_at=payload.end_at,
+        )
+        sub = self.sub_repo.create(sub)
+        return SubscriptionOut.model_validate(sub)
+
+    def list_subscriptions(self, tenant_id: UUID) -> list[SubscriptionOut]:
+        tenant = self.tenant_repo.get_by_id_no_filter(tenant_id)
+        if not tenant:
+            raise NotFoundError("Tenant not found")
+        items = self.sub_repo.get_by_tenant(tenant_id)
+        return [SubscriptionOut.model_validate(s) for s in items]
+
+    def update_subscription(
+        self, subscription_id: UUID, payload: SubscriptionUpdate
+    ) -> SubscriptionOut:
+        sub = self.sub_repo.get_by_id(subscription_id)
+        if not sub:
+            raise NotFoundError("Subscription not found")
+        if payload.plan is not None:
+            sub.plan = payload.plan
+        if payload.price is not None:
+            sub.price = payload.price
+        if payload.status is not None:
+            sub.status = payload.status
+        if payload.start_at is not None:
+            sub.start_at = payload.start_at
+        if payload.end_at is not None:
+            sub.end_at = payload.end_at
+        sub = self.sub_repo.update(sub)
+        return SubscriptionOut.model_validate(sub)
