@@ -53,7 +53,9 @@ API docs available at: **http://127.0.0.1:8001/docs**
 | CUSTOMER | `customer1@demo.com` | `Admin@123` |
 | CUSTOMER | `customer2@demo.com` | `Admin@123` |
 
----
+
+
+
 
 ## Example curl Requests
 
