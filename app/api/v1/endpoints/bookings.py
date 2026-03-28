@@ -11,26 +11,21 @@ from app.core.deps import (
     get_optional_current_user,
     require_tenant_scope,
 )
-from app.core.exceptions import NotFoundError, BadRequestError
+from app.core.exceptions import BadRequestError
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
 from app.schemas.appointment import AppointmentCreate, AppointmentUpdate
 from app.services.booking_service import BookingService
+from app.services.customer_service import CustomerService
 from app.services.service_service import ServiceService
-from app.repositories.customer_repo import CustomerRepository
 
 router = APIRouter(tags=["Bookings"])
 
 
 def _get_customer_id(user: CurrentUser, db: Session) -> UUID:
     tenant_id = require_tenant_scope(user)
-    repo = CustomerRepository(db)
-    customer = repo.get_by_user_id(user.user_id, tenant_id)
-    if not customer:
-        raise NotFoundError(
-            "No customer profile linked to your account. Contact the business admin."
-        )
-    return customer.id
+    customer_service = CustomerService(db)
+    return customer_service.resolve_customer_id_for_user(user.user_id, tenant_id)
 
 
 @router.get("/public/services", response_model=PaginatedResponse)

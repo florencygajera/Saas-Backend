@@ -8,7 +8,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import NotFoundError, BadRequestError
+from app.core.exceptions import NotFoundError, BadRequestError, ForbiddenError
 from app.models.payment import Payment
 from app.repositories.payment_repo import PaymentRepository
 from app.repositories.appointment_repo import AppointmentRepository
@@ -23,10 +23,17 @@ class PaymentService:
         self.appt_repo = AppointmentRepository(db)
         self.service_repo = ServiceRepository(db)
 
-    def start_payment(self, appointment_id: UUID, tenant_id: UUID) -> PaymentOut:
+    def start_payment(
+        self,
+        appointment_id: UUID,
+        tenant_id: UUID,
+        customer_id: UUID | None = None,
+    ) -> PaymentOut:
         appt = self.appt_repo.get_by_id(appointment_id, tenant_id=tenant_id)
         if not appt:
             raise NotFoundError("Appointment not found")
+        if customer_id and appt.customer_id != customer_id:
+            raise ForbiddenError("You can only pay for your own appointment")
 
         # Get service price
         svc = self.service_repo.get_by_id(appt.service_id, tenant_id=tenant_id)
@@ -51,7 +58,11 @@ class PaymentService:
         return PaymentOut.model_validate(payment)
 
     def verify_payment(
-        self, payment_id: UUID, otp: str, tenant_id: UUID
+        self,
+        payment_id: UUID,
+        otp: str,
+        tenant_id: UUID,
+        customer_id: UUID | None = None,
     ) -> PaymentReceipt:
         # Validate OTP format — any 4-digit string
         if not re.match(r"^\d{4}$", otp):
@@ -65,13 +76,18 @@ class PaymentService:
                 f"Payment status is {payment.status}, expected PROCESSING"
             )
 
+        appt = self.appt_repo.get_by_id(payment.appointment_id, tenant_id=tenant_id)
+        if not appt:
+            raise NotFoundError("Appointment not found")
+        if customer_id and appt.customer_id != customer_id:
+            raise ForbiddenError("You can only verify your own payment")
+
         # Mark paid
         payment.status = "PAID"
         self.db.commit()
         self.db.refresh(payment)
 
         # Auto-confirm appointment if PENDING
-        appt = self.appt_repo.get_by_id(payment.appointment_id, tenant_id=tenant_id)
         if appt and appt.status == "PENDING":
             appt.status = "CONFIRMED"
             self.db.commit()

@@ -1,6 +1,7 @@
 """Tenant service - provisioning, tenant management, and subscriptions."""
 
 from datetime import datetime, timezone
+import secrets
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -41,8 +42,8 @@ class TenantService:
         self.db.add(tenant)
         self.db.flush()  # get tenant.id
 
-        # Generate temp password
-        temp_password = "Admin@123"  # deterministic for demo; use secrets in prod
+        # Generate one-time temporary password shown only in this response.
+        temp_password = f"Tmp@{secrets.token_urlsafe(8)}"
 
         # Create tenant admin
         admin = User(

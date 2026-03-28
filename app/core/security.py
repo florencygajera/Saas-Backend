@@ -43,6 +43,7 @@ def create_access_token(
     )
     payload = {
         "sub": str(user_id),
+        "user_id": str(user_id),
         "role": role,
         "tenant_id": str(tenant_id) if tenant_id else None,
         "exp": expire,

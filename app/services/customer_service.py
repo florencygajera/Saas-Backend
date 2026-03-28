@@ -60,3 +60,11 @@ class CustomerService:
         if not obj:
             raise NotFoundError("Customer not found")
         self.repo.delete(obj)
+
+    def resolve_customer_id_for_user(self, user_id: UUID, tenant_id: UUID) -> UUID:
+        customer = self.repo.get_by_user_id(user_id=user_id, tenant_id=tenant_id)
+        if not customer:
+            raise NotFoundError(
+                "No customer profile linked to your account. Contact the business admin."
+            )
+        return customer.id

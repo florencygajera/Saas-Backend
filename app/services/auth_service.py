@@ -1,10 +1,10 @@
-"""
-Auth service — login, token creation.
-"""
+"""Auth service - login and profile retrieval."""
+
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import UnauthorizedError
+from app.core.exceptions import UnauthorizedError, NotFoundError
 from app.core.security import verify_password, create_access_token
 from app.repositories.user_repo import UserRepository
 from app.schemas.auth import LoginRequest, LoginResponse, UserInfo
@@ -23,7 +23,6 @@ class AuthService:
         if not verify_password(payload.password, user.password_hash):
             raise UnauthorizedError("Invalid email or password")
 
-        # Update last login
         self.user_repo.update_last_login(user)
 
         token = create_access_token(
@@ -36,3 +35,9 @@ class AuthService:
             access_token=token,
             user=UserInfo.model_validate(user),
         )
+
+    def get_me(self, user_id: UUID) -> UserInfo:
+        user = self.user_repo.get_by_id(user_id)
+        if not user:
+            raise NotFoundError("User not found")
+        return UserInfo.model_validate(user)

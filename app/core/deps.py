@@ -36,7 +36,7 @@ def get_current_user(
     except Exception:
         raise UnauthorizedError("Invalid or expired token")
 
-    user_id = payload.get("sub")
+    user_id = payload.get("user_id") or payload.get("sub")
     role = payload.get("role")
     tenant_id = payload.get("tenant_id")
 
@@ -111,3 +111,8 @@ def require_tenant_scope(current_user: CurrentUser) -> UUID:
     if current_user.tenant_id is None:
         raise ForbiddenError("Tenant-scoped access required")
     return current_user.tenant_id
+
+
+def enforce_tenant_scope(current_user: CurrentUser) -> UUID:
+    """Compatibility helper for explicit tenant-scope enforcement."""
+    return require_tenant_scope(current_user)
