@@ -7,7 +7,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_current_user, require_tenant_admin, CurrentUser
+from app.core.deps import (
+    get_current_user,
+    require_tenant_admin,
+    CurrentUser,
+    require_tenant_scope,
+)
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
 from app.schemas.appointment import StatusUpdate
@@ -24,11 +29,9 @@ def list_appointments(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = BookingService(db)
-    assert (
-        user.tenant_id is not None
-    ), "Tenant ID is required for appointment operations"
+    tenant_id = require_tenant_scope(user)
     items, total = svc.list_tenant_appointments(
-        tenant_id=user.tenant_id, skip=skip, limit=limit
+        tenant_id=tenant_id, skip=skip, limit=limit
     )
     return PaginatedResponse(
         data=[a.model_dump() for a in items],
@@ -54,20 +57,15 @@ def update_appointment_status(
     svc = BookingService(db)
 
     customer_id = None
+    tenant_id = require_tenant_scope(user)
     if user.role == "CUSTOMER":
-        assert (
-            user.tenant_id is not None
-        ), "Tenant ID is required for customer operations"
         cust_repo = CustomerRepository(db)
-        customer = cust_repo.get_by_user_id(user.user_id, user.tenant_id)
+        customer = cust_repo.get_by_user_id(user.user_id, tenant_id)
         customer_id = customer.id if customer else None
 
-    assert (
-        user.tenant_id is not None
-    ), "Tenant ID is required for appointment operations"
     result = svc.update_status(
         appointment_id=appointment_id,
-        tenant_id=user.tenant_id,
+        tenant_id=tenant_id,
         role=user.role,
         payload=payload,
         customer_id=customer_id,

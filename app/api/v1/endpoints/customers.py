@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.core.deps import require_tenant_admin, CurrentUser
+from app.core.deps import require_tenant_admin, CurrentUser, require_tenant_scope
 from app.db.session import get_db
 from app.schemas.common import SingleResponse, PaginatedResponse, PaginationMeta
 from app.schemas.customer import CustomerCreate, CustomerUpdate
@@ -23,8 +23,8 @@ def create_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
-    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
-    result = svc.create(tenant_id=user.tenant_id, payload=payload)
+    tenant_id = require_tenant_scope(user)
+    result = svc.create(tenant_id=tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Customer created")
 
 
@@ -36,8 +36,8 @@ def list_customers(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
-    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
-    items, total = svc.list(tenant_id=user.tenant_id, skip=skip, limit=limit)
+    tenant_id = require_tenant_scope(user)
+    items, total = svc.list(tenant_id=tenant_id, skip=skip, limit=limit)
     return PaginatedResponse(
         data=[c.model_dump() for c in items],
         meta=PaginationMeta(
@@ -53,8 +53,8 @@ def get_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
-    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
-    result = svc.get(customer_id, tenant_id=user.tenant_id)
+    tenant_id = require_tenant_scope(user)
+    result = svc.get(customer_id, tenant_id=tenant_id)
     return SingleResponse(data=result.model_dump())
 
 
@@ -66,8 +66,8 @@ def update_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
-    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
-    result = svc.update(customer_id, tenant_id=user.tenant_id, payload=payload)
+    tenant_id = require_tenant_scope(user)
+    result = svc.update(customer_id, tenant_id=tenant_id, payload=payload)
     return SingleResponse(data=result.model_dump(), message="Customer updated")
 
 
@@ -78,6 +78,6 @@ def delete_customer(
     user: CurrentUser = Depends(require_tenant_admin),
 ):
     svc = CustomerService(db)
-    assert user.tenant_id is not None, "Tenant ID is required for customer operations"
-    svc.delete(customer_id, tenant_id=user.tenant_id)
+    tenant_id = require_tenant_scope(user)
+    svc.delete(customer_id, tenant_id=tenant_id)
     return SingleResponse(message="Customer deleted")

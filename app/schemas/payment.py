@@ -5,7 +5,7 @@ Payment schemas.
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class PaymentStartRequest(BaseModel):
@@ -15,6 +15,7 @@ class PaymentStartRequest(BaseModel):
 class PaymentVerifyRequest(BaseModel):
     payment_id: UUID
     otp: str  # any 4-digit string accepted
+    model_config = ConfigDict(extra="forbid")
 
 
 class PaymentOut(BaseModel):

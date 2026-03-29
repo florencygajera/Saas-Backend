@@ -60,6 +60,17 @@ def update_tenant(
     return SingleResponse(data=result.model_dump(), message="Tenant updated")
 
 
+@router.get("/tenants/{tenant_id}", response_model=SingleResponse)
+def get_tenant(
+    tenant_id: UUID,
+    db: Session = Depends(get_db),
+    admin: CurrentUser = Depends(require_super_admin),
+):
+    service = TenantService(db)
+    result = service.get_tenant(tenant_id)
+    return SingleResponse(data=result.model_dump())
+
+
 @router.get("/platform/stats", response_model=SingleResponse)
 def platform_stats(
     db: Session = Depends(get_db),

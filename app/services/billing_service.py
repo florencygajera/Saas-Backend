@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import desc
 
+from app.core.config import settings
 from app.core.exceptions import NotFoundError, BadRequestError
 from app.models.subscription import Subscription
 from app.repositories.payment_repo import PaymentRepository
@@ -88,7 +89,7 @@ class BillingService:
         return sub
 
     def get_portal_link(self, tenant_id: UUID) -> str:
-        return f"https://billing.example.com/portal/{tenant_id}"
+        return f"{settings.BILLING_PORTAL_BASE_URL.rstrip('/')}/portal/{tenant_id}"
 
     def list_invoices(self, tenant_id: UUID, skip: int = 0, limit: int = 50) -> tuple[list[InvoiceItem], int]:
         rows, total = self.payment_repo.list_transactions(
@@ -107,4 +108,3 @@ class BillingService:
             for (p, a, c, s) in rows
         ]
         return items, total
-

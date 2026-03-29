@@ -1,7 +1,4 @@
-"""
-Security utilities: JWT token creation/verification and password hashing.
-Uses bcrypt directly instead of passlib to avoid version incompatibility.
-"""
+"""Security utilities: JWT token creation/verification and password hashing."""
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -12,10 +9,6 @@ from jose import jwt
 
 from app.core.config import settings
 
-# ---------------------------------------------------------------------------
-# Password hashing (using bcrypt directly)
-# ---------------------------------------------------------------------------
-
 
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
@@ -25,11 +18,6 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain: str, hashed: str) -> bool:
     return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
-
-
-# ---------------------------------------------------------------------------
-# JWT
-# ---------------------------------------------------------------------------
 
 
 def create_access_token(
@@ -46,11 +34,34 @@ def create_access_token(
         "user_id": str(user_id),
         "role": role,
         "tenant_id": str(tenant_id) if tenant_id else None,
+        "type": "access",
+        "exp": expire,
+    }
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+
+def create_refresh_token(user_id: UUID, expires_delta: Optional[timedelta] = None) -> str:
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(minutes=settings.JWT_REFRESH_TOKEN_EXPIRE_MINUTES)
+    )
+    payload = {
+        "sub": str(user_id),
+        "user_id": str(user_id),
+        "type": "refresh",
         "exp": expire,
     }
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
 def decode_access_token(token: str) -> dict:
-    """Decode and return the JWT payload. Raises JWTError on failure."""
-    return jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+    payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+    if payload.get("type") != "access":
+        raise ValueError("Invalid token type")
+    return payload
+
+
+def decode_refresh_token(token: str) -> dict:
+    payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+    if payload.get("type") != "refresh":
+        raise ValueError("Invalid token type")
+    return payload

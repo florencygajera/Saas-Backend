@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -18,6 +19,14 @@ class UserRepository(BaseRepository[User]):
 
     def get_by_email(self, email: str) -> Optional[User]:
         return self.db.query(User).filter(User.email == email).first()
+
+    def get_with_tenant(self, user_id: UUID) -> Optional[User]:
+        return (
+            self.db.query(User)
+            .options(joinedload(User.tenant))
+            .filter(User.id == user_id)
+            .first()
+        )
 
     def update_last_login(self, user: User) -> None:
         user.last_login_at = datetime.now(timezone.utc)
