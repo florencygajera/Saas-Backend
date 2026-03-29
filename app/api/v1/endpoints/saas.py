@@ -81,6 +81,17 @@ def tenant_stats_by_super(
     return SingleResponse(data=stats.model_dump())
 
 
+@router.get("/platform/revenue-trend", response_model=SingleResponse)
+def platform_revenue_trend(
+    range: str = Query(default="7d"),
+    db: Session = Depends(get_db),
+    admin: CurrentUser = Depends(require_super_admin),
+):
+    analytics = AnalyticsService(db)
+    trend = analytics.get_platform_revenue_trend(range_key=range)
+    return SingleResponse(data=[x.model_dump() for x in trend])
+
+
 @router.post("/tenants/{tenant_id}/subscriptions", response_model=SingleResponse)
 def create_subscription(
     tenant_id: UUID,

@@ -2,7 +2,7 @@
 Booking service — appointment CRUD + status state machine.
 """
 
-from datetime import timedelta
+from datetime import timedelta, datetime, date, timezone
 from typing import List, Tuple
 from uuid import UUID
 
@@ -20,6 +20,7 @@ from app.schemas.appointment import (
     AppointmentOut,
     StatusUpdate,
 )
+from app.schemas.service import ServiceOut
 
 # ---------------------------------------------------------------------------
 # State machine transition rules
@@ -212,3 +213,61 @@ class BookingService:
         appt.staff_id = staff.id
         appt = self.appt_repo.update(appt)
         return AppointmentOut.model_validate(appt)
+
+    def get_public_service_detail(self, service_id: UUID) -> ServiceOut:
+        svc = self.db.query(self.service_repo.model).filter(self.service_repo.model.id == service_id).first()
+        if not svc or not svc.is_active:
+            raise NotFoundError("Service not found")
+        return ServiceOut.model_validate(svc)
+
+    def get_service_availability(self, service_id: UUID, for_date: date) -> dict:
+        svc = self.db.query(self.service_repo.model).filter(self.service_repo.model.id == service_id).first()
+        if not svc or not svc.is_active:
+            raise NotFoundError("Service not found")
+
+        day_start = datetime.combine(for_date, datetime.min.time()).replace(tzinfo=timezone.utc)
+        day_end = day_start + timedelta(days=1)
+        appointments = self.appt_repo.list_by_day(
+            tenant_id=svc.tenant_id, day_start=day_start, day_end=day_end
+        )
+
+        duration = timedelta(minutes=svc.duration_min)
+        open_at = day_start.replace(hour=9, minute=0, second=0, microsecond=0)
+        close_at = day_start.replace(hour=18, minute=0, second=0, microsecond=0)
+
+        taken = {
+            appt.start_at.astimezone(timezone.utc).strftime("%H:%M")
+            for appt in appointments
+            if appt.service_id == service_id and appt.status != "CANCELLED"
+        }
+
+        slots: list[str] = []
+        cursor = open_at
+        while cursor + duration <= close_at:
+            key = cursor.strftime("%H:%M")
+            if key not in taken:
+                slots.append(key)
+            cursor += duration
+
+        staff_rows = (
+            self.db.query(self.staff_repo.model)
+            .filter(self.staff_repo.model.tenant_id == svc.tenant_id, self.staff_repo.model.is_active)
+            .all()
+        )
+        staff_availability = []
+        for row in staff_rows:
+            busy_count = sum(
+                1
+                for appt in appointments
+                if appt.staff_id == row.id and appt.status != "CANCELLED"
+            )
+            staff_availability.append(
+                {"staff_id": str(row.id), "name": row.name, "booked_slots": busy_count}
+            )
+
+        return {
+            "service_id": str(service_id),
+            "date": str(for_date),
+            "available_slots": slots,
+            "staff_availability": staff_availability,
+        }

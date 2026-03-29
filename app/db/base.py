@@ -15,3 +15,8 @@ from app.models.customer import Customer  # noqa: F401
 from app.models.appointment import Appointment  # noqa: F401
 from app.models.payment import Payment  # noqa: F401
 from app.models.event import Event  # noqa: F401
+from app.models.otp_token import OtpToken  # noqa: F401
+from app.models.api_key import ApiKey  # noqa: F401
+from app.models.team_member import TeamMember  # noqa: F401
+from app.models.preference import Preference  # noqa: F401
+from app.models.project import Project  # noqa: F401

@@ -41,3 +41,16 @@ class PlatformStats(BaseModel):
     active_tenants: int
     new_tenants_last_30d: int
     top_tenants_by_revenue: List[TopTenantItem]
+
+
+class TrendPoint(BaseModel):
+    bucket: str
+    value: float
+
+
+class TenantAnalyticsPayload(BaseModel):
+    revenue_trend: List[TrendPoint]
+    bookings_trend: List[TrendPoint]
+    user_growth: List[TrendPoint]
+    retention: float
+    status_breakdown: dict[str, int]

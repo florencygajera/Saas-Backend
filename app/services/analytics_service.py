@@ -18,6 +18,8 @@ from app.schemas.analytics import (
     TopServiceItem,
     PlatformStats,
     TopTenantItem,
+    TrendPoint,
+    TenantAnalyticsPayload,
 )
 
 
@@ -227,3 +229,105 @@ class AnalyticsService:
             new_tenants_last_30d=new_tenants_last_30d,
             top_tenants_by_revenue=top_tenants,
         )
+
+    def get_tenant_analytics(self, tenant_id: UUID, range_key: str) -> TenantAnalyticsPayload:
+        days = self._range_to_days(range_key)
+        since = datetime.now(timezone.utc) - timedelta(days=days)
+        revenue_trend = self._payment_trend(tenant_id=tenant_id, since=since)
+        bookings_trend = self._booking_trend(tenant_id=tenant_id, since=since)
+        user_growth = self._user_growth_trend(tenant_id=tenant_id, since=since)
+
+        total_customers = (
+            self.db.query(func.count(User.id))
+            .filter(User.tenant_id == tenant_id, User.role == "CUSTOMER")
+            .scalar()
+            or 0
+        )
+        repeat_customers = (
+            self.db.query(func.count(func.distinct(Appointment.customer_id)))
+            .filter(
+                Appointment.tenant_id == tenant_id,
+                Appointment.start_at >= since,
+            )
+            .group_by(Appointment.customer_id)
+            .having(func.count(Appointment.id) >= 2)
+            .count()
+        )
+        retention = float((repeat_customers / total_customers) * 100) if total_customers else 0.0
+
+        status_rows = (
+            self.db.query(Appointment.status, func.count(Appointment.id))
+            .filter(Appointment.tenant_id == tenant_id, Appointment.start_at >= since)
+            .group_by(Appointment.status)
+            .all()
+        )
+        status_breakdown = {row[0]: int(row[1]) for row in status_rows}
+
+        return TenantAnalyticsPayload(
+            revenue_trend=revenue_trend,
+            bookings_trend=bookings_trend,
+            user_growth=user_growth,
+            retention=retention,
+            status_breakdown=status_breakdown,
+        )
+
+    def get_tenant_revenue_trend(self, tenant_id: UUID, range_key: str) -> list[TrendPoint]:
+        days = self._range_to_days(range_key)
+        since = datetime.now(timezone.utc) - timedelta(days=days)
+        return self._payment_trend(tenant_id=tenant_id, since=since)
+
+    def get_platform_revenue_trend(self, range_key: str) -> list[TrendPoint]:
+        days = self._range_to_days(range_key)
+        since = datetime.now(timezone.utc) - timedelta(days=days)
+        q = (
+            self.db.query(func.date(Payment.created_at), func.coalesce(func.sum(Payment.amount), 0))
+            .filter(Payment.status == "PAID", Payment.created_at >= since)
+            .group_by(func.date(Payment.created_at))
+            .order_by(func.date(Payment.created_at))
+            .all()
+        )
+        return [TrendPoint(bucket=str(row[0]), value=float(row[1])) for row in q]
+
+    @staticmethod
+    def _range_to_days(range_key: str) -> int:
+        key = (range_key or "7d").lower()
+        mapping = {"7d": 7, "30d": 30, "90d": 90}
+        return mapping.get(key, 7)
+
+    def _payment_trend(self, tenant_id: UUID, since: datetime) -> list[TrendPoint]:
+        q = (
+            self.db.query(func.date(Payment.created_at), func.coalesce(func.sum(Payment.amount), 0))
+            .filter(
+                Payment.tenant_id == tenant_id,
+                Payment.status == "PAID",
+                Payment.created_at >= since,
+            )
+            .group_by(func.date(Payment.created_at))
+            .order_by(func.date(Payment.created_at))
+            .all()
+        )
+        return [TrendPoint(bucket=str(row[0]), value=float(row[1])) for row in q]
+
+    def _booking_trend(self, tenant_id: UUID, since: datetime) -> list[TrendPoint]:
+        q = (
+            self.db.query(func.date(Appointment.created_at), func.count(Appointment.id))
+            .filter(Appointment.tenant_id == tenant_id, Appointment.created_at >= since)
+            .group_by(func.date(Appointment.created_at))
+            .order_by(func.date(Appointment.created_at))
+            .all()
+        )
+        return [TrendPoint(bucket=str(row[0]), value=float(row[1])) for row in q]
+
+    def _user_growth_trend(self, tenant_id: UUID, since: datetime) -> list[TrendPoint]:
+        q = (
+            self.db.query(func.date(User.created_at), func.count(User.id))
+            .filter(
+                User.tenant_id == tenant_id,
+                User.role == "CUSTOMER",
+                User.created_at >= since,
+            )
+            .group_by(func.date(User.created_at))
+            .order_by(func.date(User.created_at))
+            .all()
+        )
+        return [TrendPoint(bucket=str(row[0]), value=float(row[1])) for row in q]

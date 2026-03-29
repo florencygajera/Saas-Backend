@@ -1,5 +1,6 @@
 """Customer booking endpoints - browse services and manage own bookings."""
 
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -53,6 +54,27 @@ def browse_services(
         data=[s.model_dump() for s in active],
         meta=PaginationMeta(total=len(active), skip=skip, limit=limit, has_more=False),
     )
+
+
+@router.get("/bookings/public/services/{service_id}", response_model=SingleResponse)
+def public_service_detail(
+    service_id: UUID,
+    db: Session = Depends(get_db),
+):
+    svc = BookingService(db)
+    item = svc.get_public_service_detail(service_id)
+    return SingleResponse(data=item.model_dump())
+
+
+@router.get("/bookings/availability", response_model=SingleResponse)
+def booking_availability(
+    service_id: UUID = Query(...),
+    date_value: date = Query(..., alias="date"),
+    db: Session = Depends(get_db),
+):
+    svc = BookingService(db)
+    data = svc.get_service_availability(service_id=service_id, for_date=date_value)
+    return SingleResponse(data=data)
 
 
 @router.post("/bookings", response_model=SingleResponse)

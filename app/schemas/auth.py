@@ -30,3 +30,31 @@ class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserInfo
+
+
+class SignupRequest(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    tenant_id: Optional[UUID] = None
+    create_tenant_name: Optional[str] = None
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class VerifyOtpRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
+class ResendOtpRequest(BaseModel):
+    email: EmailStr
+
+
+class SignupResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserInfo
+    otp_sent: bool = True

@@ -1,7 +1,6 @@
-"""
-Appointment repository.
-"""
+"""Appointment repository."""
 
+from datetime import datetime
 from typing import List
 from uuid import UUID
 
@@ -42,4 +41,15 @@ class AppointmentRepository(BaseRepository[Appointment]):
                 Appointment.customer_id == customer_id,
             )
             .count()
+        )
+
+    def list_by_day(self, tenant_id: UUID, day_start: datetime, day_end: datetime) -> List[Appointment]:
+        return (
+            self.db.query(Appointment)
+            .filter(
+                Appointment.tenant_id == tenant_id,
+                Appointment.start_at >= day_start,
+                Appointment.start_at < day_end,
+            )
+            .all()
         )
