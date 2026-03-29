@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     BILLING_PORTAL_BASE_URL: str = "https://billing.example.com"
 
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    CORS_ORIGINS: str | List[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     # App
     APP_NAME: str = "SaaS CRM + Booking API"
@@ -50,6 +50,13 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors(cls, value):
         if isinstance(value, str):
+            value = value.strip()
+            if value.startswith("[") and value.endswith("]"):
+                import json
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError:
+                    pass
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
 
